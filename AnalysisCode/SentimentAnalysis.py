@@ -7,15 +7,18 @@ import os
 import re
 
 class SentimentAnalysis():
-    def __init__(self):
-        self.testfilepath = "/users/andrei/documents/github/poemanalysis/poemscorpus/1900"
+    def __init__(self, period):
+        self.period = period
+        self.testfilepath = f"/users/andrei/documents/github/poemanalysis/poemscorpus/{self.period}"
         self.poems = []
         self.poemNames = []
         self.poemDict = {}
         self.afinn = Afinn()
-        self.aScore = 0
+        self.aCompScore = 0
+        self.afinnDict = {}
         self.SID = SentimentIntensityAnalyzer()
-        self.SIDScore = 0
+        self.SIDCompScore = 0
+        self.SIDDict = {}
 
     def openPoems(self):
         for poem in os.listdir(self.testfilepath):
@@ -35,21 +38,30 @@ class SentimentAnalysis():
         for poem in self.poemDict:
             line = tokenize.sent_tokenize(self.poemDict[poem])
             print(line)
-            self.poemDict[poem] = line
+            self.poemDict[poem] = line[0]
 
 
-SA = SentimentAnalysis()
+    def poemAfinn(self):
+        for poem in self.poemDict:
+            score = self.afinn.score(self.poemDict[poem])
+            self.afinnDict[poem] = score
+            self.aCompScore += score
+
+
+    def poemSID(self):
+        for poem in self.poemDict:
+            ss = self.SID.polarity_scores(self.poemDict[poem])
+            self.SIDDict[poem] = ss["compound"]
+            self.SIDCompScore += ss["compound"]
+
+SA = SentimentAnalysis('1900')
 SA.openPoems()
 SA.poemsToDict()
 SA.tokenizePoems()
-"""
-    score = afinn.score(line[0])
-    aScore += score
-    ss = SID.polarity_scores(line[0])
-    SIDScore += ss["compound"]
-    print('\n')
-    print(poem, '\n', score)
-print('\n')
-print("Compound Afinn Score: ", aScore)
-print("Compound SID Score: ", SIDScore)
-"""
+print(SA.poemDict)
+SA.poemAfinn()
+SA.poemSID()
+print("Compound Afinn Score: ", SA.aCompScore)
+print("Compound SID Score: ", SA.SIDCompScore)
+print(SA.SIDDict, '\n')
+print(SA.afinnDict)

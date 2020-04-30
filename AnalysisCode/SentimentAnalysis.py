@@ -1,5 +1,3 @@
-from matplotlib import pyplot as plt
-from nltk import sentiment
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from nltk import tokenize
 from afinn import Afinn

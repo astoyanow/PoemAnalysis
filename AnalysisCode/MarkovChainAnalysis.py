@@ -1,6 +1,14 @@
-import nltk
 import os
 import re
+import random
+
+
+filedir = "/users/andrei/documents/github/poemanalysis/poemscorpus/1600"
+fileMCs = []
+filepaths = []
+for f in os.listdir(filedir):
+    if f.endswith(".txt"):
+        filepaths.append(filedir + "/" + f)
 
 class MarkovChain():
 
@@ -22,10 +30,15 @@ class MarkovChain():
             if prevTuple not in self.a:
                 self.a[prevTuple] = {}
             self.a[prevTuple][self.words[i]] = self.a[prevTuple].get(self.words[i], 0) + 1
-            print(prevTuple)
             self.prev.append(self.words[i])
-            print(self.prev)
             self.prev = self.prev[1:]
+        prevTuple=tuple(self.prev)
+        if prevTuple not in self.a:
+            self.a[prevTuple] = {}
+            standingTuple = list(self.a.keys())[1]
+            standingString = self.words[0]
+            self.a[prevTuple][standingString] = self.a[standingTuple].get(standingString, 0) + 1
+
 
         for k in self.a:
             sum1 = 0
@@ -47,9 +60,28 @@ class MarkovChain():
             p*=self.a[currentChar].get(nextChar)
         return p
 
-testfile = '/users/andrei/documents/github/poemanalysis/poemscorpus/a country wife.txt'
+    def discrete_prob(self, d):
+        r = random.random()
+        sum = 0
+        for k in d:
+            sum += d[k]
+            if r < sum:
+                return k
+
+    def generate(self, mc, sep):
+        current = list(random.choice(list(mc.keys())))
+        seq = []
+        for i in range(50):
+            seq.append(self.discrete_prob(mc[tuple(current)]))
+            current = current[1:] + [seq[-1]]
+        return sep.join(seq)
+
+
+testfile = '/users/andrei/documents/github/poemanalysis/poemscorpus/1600/a country wife.txt'
 mc = MarkovChain(testfile)
-print(mc.a)
-print(mc.words)
-for key in mc.a:
-    print(key)
+print(mc.generate(mc.a, " "))
+for files in filepaths:
+    fileMCs.append(MarkovChain(files))
+for chains in fileMCs:
+    print(chains.generate(chains.a, " "))
+    print('\n')

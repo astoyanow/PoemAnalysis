@@ -3,26 +3,35 @@ import re
 import random
 
 
-filedir = "/users/andrei/documents/github/poemanalysis/poemscorpus/1600"
+filedir = "/users/andrei/documents/github/poemanalysis/poemscorpus"
+timePeriods = {}
 fileMCs = []
-filepaths = []
+
 for f in os.listdir(filedir):
-    if f.endswith(".txt"):
-        filepaths.append(filedir + "/" + f)
+    if f != '.DS_Store':
+        poemFolder = filedir + "/" + f
+        timePeriods[f] = []
+        for p in os.listdir(poemFolder):
+            poemFile = poemFolder + '/' + p
+            timePeriods[f].append(poemFile)
+print(timePeriods)
+
 
 class MarkovChain():
 
-    def __init__(self, filename):
+    def __init__(self, filename, order):
         self.words = []
+        self.order = order
         self.create(filename)
 
 
     def create(self, filename):
         self.a = {}
-        self.prev=['_']
+        self.prev=['_']*self.order
         openfile = open(filename)
         cleanfile=re.sub(r'[^\w\s]', '', openfile.read().lower().replace("\n", " ")).split()
         self.words = cleanfile
+        print(self.words)
 
 
         for i in range(0, len(self.words)):
@@ -77,11 +86,9 @@ class MarkovChain():
         return sep.join(seq)
 
 
-testfile = '/users/andrei/documents/github/poemanalysis/poemscorpus/1600/a country wife.txt'
-mc = MarkovChain(testfile)
-print(mc.generate(mc.a, " "))
-for files in filepaths:
-    fileMCs.append(MarkovChain(files))
-for chains in fileMCs:
-    print(chains.generate(chains.a, " "))
-    print('\n')
+def chainFilesSeparate(order):
+    for files in filepaths:
+        fileMCs.append(MarkovChain(files, order))
+    for chains in fileMCs:
+        print(chains.generate(chains.a, " "))
+        print('\n')

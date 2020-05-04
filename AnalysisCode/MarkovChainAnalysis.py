@@ -5,7 +5,7 @@ import random
 
 filedir = "/users/andrei/documents/github/poemanalysis/poemscorpus"
 timePeriods = {}
-fileMCs = []
+fileMCs = {}
 
 for f in os.listdir(filedir):
     if f != '.DS_Store':
@@ -14,7 +14,6 @@ for f in os.listdir(filedir):
         for p in os.listdir(poemFolder):
             poemFile = poemFolder + '/' + p
             timePeriods[f].append(poemFile)
-print(timePeriods)
 
 
 class MarkovChain():
@@ -31,7 +30,6 @@ class MarkovChain():
         openfile = open(filename)
         cleanfile=re.sub(r'[^\w\s]', '', openfile.read().lower().replace("\n", " ")).split()
         self.words = cleanfile
-        print(self.words)
 
 
         for i in range(0, len(self.words)):
@@ -87,8 +85,14 @@ class MarkovChain():
 
 
 def chainFilesSeparate(order):
-    for files in filepaths:
-        fileMCs.append(MarkovChain(files, order))
+    for periods in timePeriods:
+        fileMCs[periods] = []
+        for period in timePeriods[periods]:
+            fileMCs[periods].append(MarkovChain(period, order))
     for chains in fileMCs:
-        print(chains.generate(chains.a, " "))
-        print('\n')
+        print(chains)
+        for chain in fileMCs[chains]:
+            print(chain.generate(chain.a, " "))
+            print('\n')
+
+chainFilesSeparate(1)

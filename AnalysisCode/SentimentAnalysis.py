@@ -4,6 +4,18 @@ from afinn import Afinn
 import os
 import re
 
+filedir = "/users/andrei/documents/github/poemanalysis/poemscorpus"
+timePeriods = []
+fileSAs = {}
+
+for f in os.listdir(filedir):
+    if f != '.DS_Store':
+        poemFolder = filedir + "/" + f
+        timePeriods.append(f)
+        '''for p in os.listdir(poemFolder):
+            poemFile = poemFolder + '/' + p
+            timePeriods[f].append(poemFile)'''
+
 class SentimentAnalysis():
     def __init__(self, period):
         self.period = period
@@ -17,6 +29,9 @@ class SentimentAnalysis():
         self.SID = SentimentIntensityAnalyzer()
         self.SIDCompScore = 0
         self.SIDDict = {}
+        SA.openPoems()
+        SA.poemsToDict()
+        SA.tokenizePoems()
 
     def openPoems(self):
         for poem in os.listdir(self.testfilepath):
@@ -53,9 +68,9 @@ class SentimentAnalysis():
             self.SIDCompScore += ss["compound"]
 
 SA = SentimentAnalysis('1900')
-SA.openPoems()
-SA.poemsToDict()
-SA.tokenizePoems()
+#SA.openPoems()
+#SA.poemsToDict()
+#SA.tokenizePoems()
 print(SA.poemDict)
 SA.poemAfinn()
 SA.poemSID()

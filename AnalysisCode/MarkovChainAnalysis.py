@@ -41,10 +41,12 @@ class MarkovChain():
             self.prev = self.prev[1:]
         prevTuple=tuple(self.prev)
         if prevTuple not in self.a:
-            self.a[prevTuple] = {}
-            standingTuple = list(self.a.keys())[1]
-            standingString = self.words[0]
-            self.a[prevTuple][standingString] = self.a[standingTuple].get(standingString, 0) + 1
+            for i in range(0, self.order):
+                prevTuple=tuple(self.prev)
+                self.a[prevTuple] = {}
+                self.a[prevTuple][self.words[i]] = self.a[prevTuple].get(self.words[i], 0) + 1
+                self.prev.append(self.words[i])
+                self.prev = self.prev[1:]
 
 
         for k in self.a:
@@ -78,7 +80,7 @@ class MarkovChain():
     def generate(self, mc, sep):
         current = list(random.choice(list(mc.keys())))
         seq = []
-        for i in range(50):
+        for i in range(100):
             seq.append(self.discrete_prob(mc[tuple(current)]))
             current = current[1:] + [seq[-1]]
         return sep.join(seq)
@@ -95,4 +97,4 @@ def chainFilesSeparate(order):
             print(chain.generate(chain.a, " "))
             print('\n')
 
-chainFilesSeparate(1)
+chainFilesSeparate(4)
